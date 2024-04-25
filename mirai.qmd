@@ -29,15 +29,13 @@ h2 {
 # mirai
 
 ## 未来
-
-. . .
+::: {.nonincremental}
 
 みらい &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; / mI ˈ ra ˈ i: /
 
-. . .
 
 n. future
-
+:::
 . . .
 
 ![](images/miraicran.png)
@@ -65,9 +63,13 @@ m$data
 
 But what's so special about this? ...
 
+. . .
+
+::: {.nonincremental}
 1. Highly performant
 2. Simple and robust
 3. Designed for production
+:::
 
 ##
 
@@ -105,21 +107,18 @@ Nanomsg Next Generation
 
 Implementation completely devoid of polling loops:
 
-::: {.fragment}
 ```{.r}
 while (unresolved(mirai)) {
   Sys.sleep(0.1)
 }
 ```
-:::
+
 
 * Even for promises[^1]
 
 * A world first!!
 
 * Special thanks to Joe Cheng (CTO Posit), creator of the Shiny framework
-
-* Instead uses: asynchronous callbacks from NNG
 
 [^1]: For mirai >= 0.13.2.9008 and upcoming mirai 1.0
 
@@ -129,15 +128,17 @@ while (unresolved(mirai)) {
 
 * ~500 lines of code (in total)
 
-* Minimal interface (good defaults)
+  + Fewer potential points of failure
+  
+  + Extremely low overhead
 
-* No 'intimidating' array of options
+* Minimal interface
 
-* Easy to pick up
+  + Aim to provide good defaults
 
 ## Code correctness
 
-* Explicit design: variables must be passed explicitly to the mirai
+Explicit by design: variables must be passed to the mirai
 
 . . .
 
@@ -155,11 +156,11 @@ m <- mirai(
 )
 ```
 
-  + no 'automagical' inferral (error-prone and makes code difficult to debug)
+* no 'automagical' inferral (error-prone and makes code difficult to debug)
   
 ## Code correctness
 
-* Convenience feature: allows passing an environment e.g. `environment()` (the calling environment)
+Convenience feature: allows passing an environment e.g. `environment()` (the calling environment)
 
 . . .
 
@@ -177,28 +178,30 @@ m <- mirai(
 )
 ```
 
+* one function call replaces having to specify all variables
+
 # 3: Designed for Production
 
 ## Powers Crew and Targets
 
 ![](images/crew.png)
 
+* Collaboration with Will Landau, author of the `targets` reproducible pipeline ecosystem
 * `crew` extends `mirai` to High-Performance Computing environments such as traditional clusters or the cloud
-* The default HPC backend for `targets` reproducible pipeline ecosystem by Will Landau
+* The default HPC backend for `targets`
 
 ## Powers Crew and Targets
 
-![](images/targets.png)
+![](images/rcons.png)
 
-* Used on daily basis in the life sciences industry
-* Powers Bayesian simulations for clinical trials
-* Computations parallelised over thousands of HPC compute nodes
+* Adoption in the life sciences industry
+* Bayesian simulations for clinical trials parallelised over thousands of compute nodes
 
 ## Integrated with Base R
 
 Request by R Core (Luke Tierney) at R Project Sprint 2023
 
-* `mirai` added as the first alternative communications backend for the base `parallel` package.
+* `mirai` added as the first alternative communications backend for the base `parallel` package
 
 . . .
 
@@ -216,13 +219,10 @@ cl
 
 ## ExtendedTask vs. Shiny Async
 
-. . .
-
 In 2017-2018, async programming introduced to R, and then Shiny, through the `later` and `promises` packages by Joe Cheng
 
 * Shiny Async "was never a truly satisfying solution"
 * Allows concurrent sessions (multiple users)
-* Async operations "infect" everything downstream
 * Did not solve intra-session concurrency and responsiveness
 * UNTIL NOW with ExtendedTask (elegant solution to free up the reactive cycle)
 
@@ -255,46 +255,48 @@ with(daemons(2), runApp(app))
 
 ## Steps to Use ExtendedTask
 
+::: {.nonincremental}
 1. [UI] create a `bslib::input_task_button()`. Nicer button automatically disabled during computation to prevent extra clicks
 
-. . .
 
 ```{.r}
 input_task_button("btn", "Plot uniform distribution")
 ```
+:::
 
 ## Steps to Use ExtendedTask
 
-2. [server] create an ExtendedTask by calling `ExtendedTask$new()` on a function passing `...` to a `mirai()` call, bind it to the button created above
+::: {.nonincremental}
 
-. . .
+2. [server] create an ExtendedTask by calling `ExtendedTask$new()` on a function passing `...` to a `mirai()` call, bind it to the button created above
 
 ```{.r}
 extended_task <- ExtendedTask$new(
     function(...) mirai({Sys.sleep(y); runif(x)}, ...)
   ) |> bind_task_button("btn")
 ```
-
+:::
 . . .
 
-
+::: {.nonincremental}
 3. [server] create an observer on the input button, which invokes the ExtendedTask with the _named_ parameters for the mirai (passed via the `...`)
 
-. . .
 
 ```{.r}
 observeEvent(input$btn, extended_task$invoke(x = input$n, y = input$delay))
 ```
+:::
 
 ## Steps to Use ExtendedTask
 
+::: {.nonincremental}
 4. [server] create a render function for the output, which consumes the result of the ExtendedTask
 
-. . .
 
 ```{.r}
 output$plot <- renderPlot(hist(extended_task$result()))
 ```
+:::
 
 ## Another Way
 
@@ -350,7 +352,7 @@ pr() |>
 
 ## Using mirai with Plumber
 
-```{.r code-line-numbers="6,9-10"}
+```{.r code-line-numbers="4,6,9-10"}
 function(req, res) {
   mirai(
   {
@@ -364,16 +366,25 @@ function(req, res) {
   })
 }
 ```
-General solution:
+. . .
 
+::: {.nonincremental}
 * Pass in only required parts of 'req' to the mirai
-* Assign the return value to 'res' in the promise action
+* Return a list from the mirai
+* Use promise action to assign this to correct parts of 'res'
+:::
 
 ## Summary {.center}
 
+. . .
+
+::: {.nonincremental}
 * mirai is the next generation parallel & distributed computing platform
 * First implementation of event-driven promises
 * First alternative communications backend for the `parallel` package
+:::
+
+. . .
 
 Thank you!
 
