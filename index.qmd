@@ -211,11 +211,11 @@ Request by R Core (Luke Tierney) at R Project Sprint 2023
 
 ```{.r}
 library(parallel)
-mirai::register_cluster()
 
-cl <- makeCluster(2)
+cl <- mirai::make_cluster(2)
 cl
 #> < miraiCluster | ID: `0` nodes: 2 active: TRUE >
+
 ```
 
 
@@ -374,7 +374,6 @@ function(req, res) {
   })
 }
 ```
-. . .
 
 * Pass in only required parts of 'req' from router to the mirai
 * Return a list from the mirai
