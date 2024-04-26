@@ -368,18 +368,16 @@ function(req, res) {
 ```
 . . .
 
-::: {.nonincremental}
 * Pass in only required parts of 'req' to the mirai
 * Return a list from the mirai
 * Use promise action to assign this to correct parts of 'res'
-:::
 
 ## Summary {.center}
 
 . . .
 
 ::: {.nonincremental}
-* mirai is the next generation parallel & distributed computing platform
+* `mirai` is the next generation parallel & distributed computing platform
 * First implementation of event-driven promises
 * First alternative communications backend for the `parallel` package
 :::
@@ -432,10 +430,10 @@ plotServer <- function(id, calc_time) {
     id,
     function(input, output, session) {
       extended_task <- ExtendedTask$new(
-        function(x, run = run_task) mirai(run(x), environment())
+        function(...) mirai(run(x), ...)
       ) |> bind_task_button("resample")
       
-      observeEvent(input$resample, extended_task$invoke(calc_time))
+      observeEvent(input$resample, extended_task$invoke(x = calc_time, run = run_task))
       
       output$plot <- renderPlot(plot_result(extended_task$result()))
       
