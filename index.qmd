@@ -1,7 +1,7 @@
 ---
 title: mirai - for Shiny and Plumber Applications
 subtitle: SatRdays London 2024
-author: Charlie Gao
+author: Charlie Gao | Hibiki AI
 date: April 27, 2024
 format:
     revealjs:
@@ -116,29 +116,33 @@ while (unresolved(mirai)) {
 
 * Even for promises[^1]
 
-* A world first!!
+* A world first - exclusive announcement for SatRdays!!
 
 * Special thanks to Joe Cheng (CTO Posit), creator of the Shiny framework
+
+* Achieved via asynchronous NNG callbacks
 
 [^1]: For mirai >= 0.13.2.9008 and upcoming mirai 1.0
 
 # 2: Simple and robust
 
-## Code simplicity
+## Designed for Simplicity
 
-* ~500 lines of code (in total)
+* Minimal code base
 
-  + Fewer potential points of failure
+  + ~500 lines of code (in total)
   
   + Extremely low overhead
+  
+  + Fewer potential points of failure
 
 * Minimal interface
 
   + Aim to provide good defaults
 
-## Code correctness
+## Designed for Correctness
 
-Explicit by design: variables must be passed to the mirai
+Variables must be explicitly passed to the mirai
 
 . . .
 
@@ -223,6 +227,7 @@ In 2017-2018, async programming introduced to R, and then Shiny, through the `la
 
 * Shiny Async "was never a truly satisfying solution"
 * Allows concurrent sessions (multiple users)
+* Async "infects" everything downstream
 * Did not solve intra-session concurrency and responsiveness
 * UNTIL NOW with ExtendedTask (elegant solution to free up the reactive cycle)
 
@@ -249,14 +254,14 @@ server <- function(input, output, session) {
 }
 
 app <- shinyApp(ui = ui, server = server)
-with(daemons(2), runApp(app))
+with(daemons(3), runApp(app))
 ```
 <https://shikokuchuo.net/mirai/articles/shiny.html>
 
 ## Steps to Use ExtendedTask
 
 ::: {.nonincremental}
-1. [UI] create a `bslib::input_task_button()`. Nicer button automatically disabled during computation to prevent extra clicks
+1. [UI] create a `bslib::input_task_button()`. Nicer button automatically disabled during computation to prevent too many clicks
 
 
 ```{.r}
@@ -268,7 +273,7 @@ input_task_button("btn", "Plot uniform distribution")
 
 ::: {.nonincremental}
 
-2. [server] create an ExtendedTask by calling `ExtendedTask$new()` on a function passing `...` to a `mirai()` call, bind it to the button created above
+2. [server] create an ExtendedTask by calling `ExtendedTask$new()` on a function passing `...` to a `mirai()` call, then bind it to the task button
 
 ```{.r}
 extended_task <- ExtendedTask$new(
@@ -321,8 +326,11 @@ server <- function(input, output, session) {
 }
 
 app <- shinyApp(ui = ui, server = server)
-with(daemons(2), runApp(app))
+with(daemons(3), runApp(app))
 ```
+::: {.nonincremental}
+* using `environment()` instead of `...`
+:::
 
 # Plumber
 
@@ -368,9 +376,9 @@ function(req, res) {
 ```
 . . .
 
-* Pass in only required parts of 'req' to the mirai
+* Pass in only required parts of 'req' from router to the mirai
 * Return a list from the mirai
-* Use promise action to assign this to correct parts of 'res'
+* Use promise action to assign components to 'res' back in the router
 
 ## Summary {.center}
 
